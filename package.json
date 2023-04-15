@@ -1,0 +1,7 @@
+{
+    "name": "sql-tables",
+    "files": {
+        "lua/packages/sql-tables/package.lua": "",
+        "lua/packages/sql-tables/init.lua": ""
+    }
+}
