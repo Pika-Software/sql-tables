@@ -1,7 +1,7 @@
 {
     "name": "sql-tables",
     "files": {
-        "lua/packages/sql-tables/package.lua": "",
-        "lua/packages/sql-tables/init.lua": ""
+        "lua/packages/sql-tables/package.lua": "https://raw.githubusercontent.com/Pika-Software/sql-tables/master/lua/packages/sql-tables/package.lua",
+        "lua/packages/sql-tables/init.lua": "https://raw.githubusercontent.com/Pika-Software/sql-tables/master/lua/packages/sql-tables/init.lua"
     }
 }
