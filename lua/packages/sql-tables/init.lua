@@ -1,5 +1,7 @@
-local spon = import( "https://raw.githubusercontent.com/thelastpenguin/sPON/master/lua/includes/modules/spon.lua" )
+import( gpm.LuaPackageExists( "packages/pon" ) and "packages/pon" or "https://github.com/Pika-Software/pon" )
+
 local string = string
+local pon = pon
 local sql = sql
 
 module( "sqlt", package.seeall )
@@ -12,7 +14,7 @@ function MetaTable:Get( key, default )
 
     local queueValue = self.Queue[ key ]
     if queueValue ~= nil then
-        return spon.decode( queueValue )
+        return pon.decode( queueValue )
     end
 
     local query = sql.Query( string.format( "SELECT `value` FROM %s WHERE `key` = %s;", self.Name, key ) )
@@ -24,13 +26,13 @@ function MetaTable:Get( key, default )
     local value = result.value
     if not value then return default end
 
-    return spon.decode( value )
+    return pon.decode( value )
 end
 
 function MetaTable:Set( key, value )
     ArgAssert( key, 1, "string" )
     if string.Trim( key ) == "" then return error( "invalid key" ) end
-    self.Queue[ sql.SQLStr( key ) ] = spon.encode( value )
+    self.Queue[ sql.SQLStr( key ) ] = pon.encode( value )
     self:Sync()
 end
 
