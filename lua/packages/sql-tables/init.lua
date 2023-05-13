@@ -1,4 +1,4 @@
-import( gpm.LuaPackageExists( "packages/pon" ) and "packages/pon" or "https://github.com/Pika-Software/pon" )
+import( gpm.PackageExists( "packages/pon" ) and "packages/pon" or "https://github.com/Pika-Software/pon" )
 
 local string = string
 local pon = pon
