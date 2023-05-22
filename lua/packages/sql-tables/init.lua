@@ -1,4 +1,4 @@
-import( gpm.PackageExists( "packages/pon" ) and "packages/pon" or "https://github.com/Pika-Software/pon" )
+require( "packages/pon", "https://github.com/Pika-Software/pon" )
 
 local string = string
 local pon = pon
