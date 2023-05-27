@@ -1,4 +1,4 @@
-require( "packages/pon", "https://github.com/Pika-Software/pon" )
+install( "packages/pon", "https://github.com/Pika-Software/pon" )
 
 local string = string
 local pon = pon
