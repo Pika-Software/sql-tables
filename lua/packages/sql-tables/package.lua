@@ -1,4 +1,3 @@
 name = "sql-tables"
 main = "init.lua"
-version = 000100
-autorun = true
+version = 000200

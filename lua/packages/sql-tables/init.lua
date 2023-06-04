@@ -1,20 +1,29 @@
-install( "packages/pon", "https://github.com/Pika-Software/pon" )
 
+local encoder = install( "packages/glua-encoder", "https://github.com/Pika-Software/glua-encoder" )
 local string = string
-local pon = pon
 local sql = sql
 
-module( "sqlt", package.seeall )
+local timer_Create = timer.Create
+local setmetatable = setmetatable
+local pairs = pairs
+local error = error
+local type = type
 
-MetaTable = MetaTable or {}
-MetaTable.__index = MetaTable
+module( "sqlt" )
 
-function MetaTable:Get( key, default )
+local meta = MetaTable
+if type( meta ) ~= "table" then
+    meta = {}; MetaTable = meta
+end
+
+meta.__index = meta
+
+function meta:Get( key, default )
     key = sql.SQLStr( key )
 
     local queueValue = self.Queue[ key ]
     if queueValue ~= nil then
-        return pon.decode( queueValue )
+        return encoder.Decode( queueValue )
     end
 
     local query = sql.Query( string.format( "SELECT `value` FROM %s WHERE `key` = %s;", self.Name, key ) )
@@ -26,55 +35,50 @@ function MetaTable:Get( key, default )
     local value = result.value
     if not value then return default end
 
-    return pon.decode( value )
+    return encoder.Decode( value )
 end
 
-function MetaTable:Set( key, value )
-    ArgAssert( key, 1, "string" )
+function meta:Set( key, value )
     if string.Trim( key ) == "" then return error( "invalid key" ) end
-    self.Queue[ sql.SQLStr( key ) ] = pon.encode( value )
+    self.Queue[ sql.SQLStr( key ) ] = encoder.Encode( value )
     self:Sync()
+    return self
 end
 
-do
+function meta:Sync()
+    timer_Create( self.Name, 0.025, 1, function()
+        sql.Query( "BEGIN;" )
 
-    local timer_Create = timer.Create
-    local pairs = pairs
+        for key, value in pairs( self.Queue ) do
+            sql.Query( string.format( "INSERT OR REPLACE INTO %s ( `key`, `value` ) VALUES ( %s, %s );", self.Name, key, sql.SQLStr( value ) ) )
+            self.Queue[ key ] = nil
+        end
 
-    function MetaTable:Sync()
-        timer_Create( self.Name, 0.025, 1, function()
-            sql.Query( "BEGIN;" )
+        sql.Query( "COMMIT;" )
+    end )
 
-            for key, value in pairs( self.Queue ) do
-                sql.Query( string.format( "INSERT OR REPLACE INTO %s ( `key`, `value` ) VALUES ( %s, %s );", self.Name, key, sql.SQLStr( value ) ) )
-                self.Queue[ key ] = nil
-            end
-
-            sql.Query( "COMMIT;" )
-        end )
-    end
-
+    return self
 end
 
-function MetaTable:Create()
+function meta:Create()
     sql.Query( "CREATE TABLE IF NOT EXISTS " .. self.Name .. " ( `key` TEXT NOT NULL PRIMARY KEY, `value` TEXT NOT NULL);" )
+    return self
 end
 
-function MetaTable:Drop()
+function meta:Drop()
     sql.Query( "DROP TABLE " .. self.Name .. ";" )
+    return self
 end
 
-function MetaTable:Recreate()
+function meta:Reset()
     self:Drop()
     self:Create()
+    return self
 end
 
 function Create( name )
-    local new = setmetatable( {
+    return setmetatable( {
         ["Name"] = sql.SQLStr( "sqlt_" .. name ),
         ["Queue"] = {}
-    }, MetaTable )
-
-    new:Create()
-    return new
+    }, meta ):Create()
 end
