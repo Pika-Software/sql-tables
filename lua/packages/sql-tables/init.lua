@@ -1,4 +1,3 @@
-
 local encoder = install( "packages/glua-encoder", "https://github.com/Pika-Software/glua-encoder" )
 local string = string
 local sql = sql
