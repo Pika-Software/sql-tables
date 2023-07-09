@@ -4,8 +4,8 @@ local sql = sql
 
 local timer_Create = timer.Create
 local setmetatable = setmetatable
+local ArgAssert = ArgAssert
 local pairs = pairs
-local error = error
 local type = type
 
 module( "sqlt" )
@@ -18,6 +18,8 @@ end
 meta.__index = meta
 
 function meta:Get( key, default )
+    ArgAssert( key, 1, "string" )
+
     local queueValue = self.Queue[ key ]
     if queueValue ~= nil then
         return encoder.Decode( queueValue )
@@ -42,9 +44,7 @@ function meta:Get( key, default )
 end
 
 function meta:Set( key, value, instant )
-    if #string.Trim( key ) == 0 then
-        error( "invalid key" )
-    end
+    ArgAssert( key, 1, "string" )
 
     self.Queue[ key ] = encoder.Encode( value )
 
@@ -88,6 +88,7 @@ function meta:Reset()
 end
 
 function Create( name )
+    ArgAssert( name, 1, "string" )
     return setmetatable( {
         ["Name"] = sql.SQLStr( "sqlt_" .. name ),
         ["Queue"] = {}
